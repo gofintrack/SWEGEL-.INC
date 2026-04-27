@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: swegel-landing-auth
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    autoDeploy: true
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: MONGO_URI
+        sync: false
+      - key: SESSION_SECRET
+        sync: false

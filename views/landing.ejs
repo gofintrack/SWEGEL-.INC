@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Landing Page</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body class="landing-body">
+    <canvas id="bgNetwork"></canvas>
+    <div class="blood-layer" id="bloodLayer"></div>
+
+    <header class="top-nav">
+      <div class="brand">SWEGEL CORPS</div>
+      <nav class="menu-wrap">
+        <div class="dropdown">
+          <button class="dropbtn">Tools</button>
+          <div class="dropdown-content">
+            <% tools.forEach((item) => { %>
+            <a href="<%= item.url %>" target="_blank" rel="noopener noreferrer"><%= item.name %></a>
+            <% }) %>
+          </div>
+        </div>
+        <div class="dropdown">
+          <button class="dropbtn">Script</button>
+          <div class="dropdown-content">
+            <% scripts.forEach((item) => { %>
+            <a href="<%= item.url %>" target="_blank" rel="noopener noreferrer"><%= item.name %></a>
+            <% }) %>
+          </div>
+        </div>
+        <% if (masterAccessGranted) { %>
+        <a class="nav-link" href="/panel">Panel</a>
+        <% } else { %>
+        <a class="nav-link" href="/setup-key">Unlock</a>
+        <% } %>
+      </nav>
+    </header>
+
+    <main class="hero">
+      <h1>Access Controlled Landing</h1>
+      <p>Secure gateway with MongoDB auth + dynamic product controls.</p>
+      <a class="buy-now-btn" href="https://t.me/SweGeL_Corps" target="_blank" rel="noopener noreferrer">
+        Buy Now
+      </a>
+    </main>
+
+    <script src="/js/landing.js"></script>
+  </body>
+</html>

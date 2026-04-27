@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Control Panel</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body class="panel-body">
+    <header class="panel-header">
+      <h1>Product Control Panel</h1>
+      <div class="panel-actions">
+        <a href="/">Landing</a>
+        <form action="/logout" method="post">
+          <button type="submit" class="logout">Logout</button>
+        </form>
+      </div>
+    </header>
+
+    <main class="panel-main">
+      <% if (error) { %>
+      <div class="alert error"><%= error %></div>
+      <% } %>
+      <% if (success) { %>
+      <div class="alert success"><%= success %></div>
+      <% } %>
+
+      <section class="panel-card">
+        <h2>Tambah Product</h2>
+        <form action="/products" method="post" class="panel-form">
+          <label for="name">Nama Product</label>
+          <input id="name" name="name" type="text" required />
+
+          <label for="category">Kategori Dropdown</label>
+          <select id="category" name="category" required>
+            <option value="tools">Tools</option>
+            <option value="script">Script</option>
+          </select>
+
+          <label for="url">Redirect Link</label>
+          <input id="url" name="url" type="url" required />
+
+          <button type="submit">Simpan Product</button>
+        </form>
+      </section>
+
+      <section class="panel-card">
+        <h2>Daftar Product</h2>
+        <div class="product-list">
+          <% if (!products.length) { %>
+          <p>Belum ada product.</p>
+          <% } %>
+          <% products.forEach((item) => { %>
+          <div class="product-row">
+            <div>
+              <strong><%= item.name %></strong>
+              <p><%= item.category.toUpperCase() %></p>
+            </div>
+            <a href="<%= item.url %>" target="_blank" rel="noopener noreferrer">Open Link</a>
+          </div>
+          <% }) %>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
