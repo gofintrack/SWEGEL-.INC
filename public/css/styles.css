@@ -65,22 +65,18 @@ body {
   position: relative;
   z-index: 3;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding: 18px 32px;
   background: rgba(0, 0, 0, 0.65);
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-.brand {
-  letter-spacing: 2px;
-  font-weight: 700;
-}
-
 .menu-wrap {
   display: flex;
   align-items: center;
   gap: 14px;
+  justify-content: center;
 }
 
 .dropdown {
@@ -144,6 +140,10 @@ body {
 .hero p {
   color: var(--muted);
   margin-bottom: 28px;
+  max-width: 760px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
 }
 
 .buy-now-btn {
