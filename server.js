@@ -29,6 +29,15 @@ const defaultProducts = [
   { name: "TopperPay", category: "script", url: "https://example.com/topperpay", isDefault: true }
 ];
 
+async function renderPanel(res, status, messageType, messageText) {
+  const products = await Product.find().sort({ createdAt: -1 }).lean();
+  return res.status(status).render("dashboard", {
+    products,
+    error: messageType === "error" ? messageText : null,
+    success: messageType === "success" ? messageText : null
+  });
+}
+
 function requireMasterAccess(req, res, next) {
   if (req.session.masterAccessGranted) return next();
   return res.redirect("/setup-key");
@@ -146,19 +155,13 @@ app.post("/setup-key", async (req, res) => {
 });
 
 app.get("/panel", requireMasterAccess, async (req, res) => {
-  const products = await Product.find().sort({ createdAt: -1 }).lean();
-  res.render("dashboard", { products, error: null, success: null });
+  return renderPanel(res, 200, null, null);
 });
 
 app.post("/products", requireMasterAccess, async (req, res) => {
   const { name, category, url } = req.body;
   if (!name || !url || !["tools", "script"].includes(category)) {
-    const products = await Product.find().sort({ createdAt: -1 }).lean();
-    return res.status(400).render("dashboard", {
-      products,
-      error: "Data product tidak valid.",
-      success: null
-    });
+    return renderPanel(res, 400, "error", "Data product tidak valid.");
   }
 
   await Product.create({
@@ -168,12 +171,51 @@ app.post("/products", requireMasterAccess, async (req, res) => {
     isDefault: false
   });
 
-  const products = await Product.find().sort({ createdAt: -1 }).lean();
-  return res.render("dashboard", {
-    products,
-    error: null,
-    success: "Product berhasil ditambahkan."
-  });
+  return renderPanel(res, 200, "success", "Product berhasil ditambahkan.");
+});
+
+app.post("/products/:id/edit", requireMasterAccess, async (req, res) => {
+  const { id } = req.params;
+  const { name, category, url } = req.body;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return renderPanel(res, 400, "error", "ID product tidak valid.");
+  }
+
+  if (!name || !url || !["tools", "script"].includes(category)) {
+    return renderPanel(res, 400, "error", "Data edit product tidak valid.");
+  }
+
+  const updated = await Product.findByIdAndUpdate(
+    id,
+    {
+      $set: {
+        name: name.trim(),
+        category,
+        url: url.trim()
+      }
+    },
+    { new: true }
+  );
+
+  if (!updated) {
+    return renderPanel(res, 404, "error", "Product tidak ditemukan.");
+  }
+
+  return renderPanel(res, 200, "success", "Product berhasil diupdate.");
+});
+
+app.post("/products/:id/delete", requireMasterAccess, async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return renderPanel(res, 400, "error", "ID product tidak valid.");
+  }
+
+  const deleted = await Product.findByIdAndDelete(id);
+  if (!deleted) {
+    return renderPanel(res, 404, "error", "Product tidak ditemukan.");
+  }
+
+  return renderPanel(res, 200, "success", "Product berhasil dihapus.");
 });
 
 app.post("/logout", (req, res) => {

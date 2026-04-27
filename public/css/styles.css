@@ -279,22 +279,41 @@ button {
 .product-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   border: 1px solid #262626;
   border-radius: 8px;
   padding: 10px;
 }
 
-.product-row p {
-  margin: 3px 0 0;
-  color: #bdbdbd;
-  font-size: 0.85rem;
+.product-row.editable {
+  flex-direction: column;
 }
 
-.product-row a {
+.product-edit-form {
+  width: 100%;
+  display: grid;
+  gap: 8px;
+}
+
+.row-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.row-actions a {
   color: #ff666a;
   text-decoration: none;
+}
+
+.delete-form {
+  width: 100%;
+}
+
+.danger-btn {
+  background: linear-gradient(90deg, #4f0606, #a90d0d);
+  border-color: #d12626;
 }
 
 @media (max-width: 768px) {

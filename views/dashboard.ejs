@@ -51,12 +51,28 @@
           <p>Belum ada product.</p>
           <% } %>
           <% products.forEach((item) => { %>
-          <div class="product-row">
-            <div>
-              <strong><%= item.name %></strong>
-              <p><%= item.category.toUpperCase() %></p>
-            </div>
-            <a href="<%= item.url %>" target="_blank" rel="noopener noreferrer">Open Link</a>
+          <div class="product-row editable">
+            <form action="/products/<%= item._id %>/edit" method="post" class="product-edit-form">
+              <label>Nama Product</label>
+              <input name="name" type="text" value="<%= item.name %>" required />
+
+              <label>Kategori</label>
+              <select name="category" required>
+                <option value="tools" <%= item.category === "tools" ? "selected" : "" %>>Tools</option>
+                <option value="script" <%= item.category === "script" ? "selected" : "" %>>Script</option>
+              </select>
+
+              <label>Redirect Link</label>
+              <input name="url" type="url" value="<%= item.url %>" required />
+
+              <div class="row-actions">
+                <button type="submit">Update</button>
+                <a href="<%= item.url %>" target="_blank" rel="noopener noreferrer">Open Link</a>
+              </div>
+            </form>
+            <form action="/products/<%= item._id %>/delete" method="post" class="delete-form">
+              <button type="submit" class="danger-btn">Hapus</button>
+            </form>
           </div>
           <% }) %>
         </div>
