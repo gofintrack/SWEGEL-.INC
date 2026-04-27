@@ -6,7 +6,7 @@ const path = require("path");
 const bcrypt = require("bcryptjs");
 const express = require("express");
 const session = require("express-session");
-const MongoStore = require("connect-mongo");
+const connectMongo = require("connect-mongo");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const mongoose = require("mongoose");
@@ -18,6 +18,7 @@ const app = express();
 const PORT = Number(process.env.PORT || 3000);
 const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/landing_auth_db";
 const SESSION_SECRET = process.env.SESSION_SECRET || "replace-this-session-secret";
+const MongoStore = connectMongo.default || connectMongo.MongoStore || connectMongo;
 
 const defaultProducts = [
   { name: "Sender", category: "tools", url: "https://example.com/sender", isDefault: true },
