@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Landing Page</title>
+    <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="stylesheet" href="/css/styles.css" />
   </head>
   <body class="landing-body">
@@ -13,7 +14,7 @@
     <header class="top-nav">
       <nav class="menu-wrap">
         <div class="dropdown">
-          <button class="dropbtn">Tools</button>
+          <button class="dropbtn" type="button">Tools</button>
           <div class="dropdown-content">
             <% tools.forEach((item) => { %>
             <a href="<%= item.url %>" target="_blank" rel="noopener noreferrer"><%= item.name %></a>
@@ -21,7 +22,7 @@
           </div>
         </div>
         <div class="dropdown">
-          <button class="dropbtn">Script</button>
+          <button class="dropbtn" type="button">Script</button>
           <div class="dropdown-content">
             <% scripts.forEach((item) => { %>
             <a href="<%= item.url %>" target="_blank" rel="noopener noreferrer"><%= item.name %></a>
@@ -34,7 +35,8 @@
     <main class="hero">
       <h1>SweGeL .Inc</h1>
       <p>
-        Premium collection of advanced tools and scripts
+        Premium toolkit for Validator, Email Sender, and Shortlink Generator, plus trusted script
+        packages: Xfinity, Chase, and TopperPay in one controlled marketplace.
       </p>
       <a class="buy-now-btn" href="https://t.me/SweGeL_Corps" target="_blank" rel="noopener noreferrer">
         Buy Now
