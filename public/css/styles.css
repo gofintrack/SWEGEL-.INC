@@ -63,7 +63,7 @@ body {
 
 .top-nav {
   position: relative;
-  z-index: 3;
+  z-index: 20;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -81,7 +81,7 @@ body {
 
 .dropdown {
   position: relative;
-  z-index: 5;
+  z-index: 25;
 }
 
 .dropbtn,
@@ -99,6 +99,7 @@ body {
   position: absolute;
   top: 100%;
   left: 0;
+  z-index: 30;
   min-width: 180px;
   display: none;
   flex-direction: column;
@@ -126,7 +127,7 @@ body {
 
 .hero {
   position: relative;
-  z-index: 3;
+  z-index: 5;
   min-height: calc(100vh - 78px);
   display: grid;
   place-content: center;
@@ -137,6 +138,88 @@ body {
 .hero h1 {
   margin: 0 0 8px;
   font-size: clamp(2rem, 6vw, 3.4rem);
+}
+
+.logo-glitch {
+  position: relative;
+  display: inline-block;
+  letter-spacing: 0.03em;
+  text-transform: none;
+  animation: logoGlitchBase 2.8s infinite linear;
+}
+
+.logo-glitch::before,
+.logo-glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.logo-glitch::before {
+  color: #00f6ff;
+  transform: translate(2px, 0);
+  clip-path: polygon(0 2%, 100% 2%, 100% 44%, 0 44%);
+  animation: logoGlitchA 1.25s infinite steps(2, end);
+}
+
+.logo-glitch::after {
+  color: #ff242b;
+  transform: translate(-2px, 0);
+  clip-path: polygon(0 58%, 100% 58%, 100% 100%, 0 100%);
+  animation: logoGlitchB 1.55s infinite steps(2, end);
+}
+
+@keyframes logoGlitchBase {
+  0%,
+  88%,
+  100% {
+    text-shadow: 0 0 0 transparent;
+  }
+  89% {
+    text-shadow: -2px 0 #ff242b, 2px 0 #00f6ff;
+  }
+  90% {
+    text-shadow: 2px 0 #ff242b, -2px 0 #00f6ff;
+  }
+  91% {
+    text-shadow: -1px 0 #ff242b, 1px 0 #00f6ff;
+  }
+}
+
+@keyframes logoGlitchA {
+  0%,
+  100% {
+    transform: translate(2px, 0);
+  }
+  25% {
+    transform: translate(-2px, -1px);
+  }
+  50% {
+    transform: translate(1px, 1px);
+  }
+  75% {
+    transform: translate(-1px, 0);
+  }
+}
+
+@keyframes logoGlitchB {
+  0%,
+  100% {
+    transform: translate(-2px, 0);
+  }
+  25% {
+    transform: translate(1px, 1px);
+  }
+  50% {
+    transform: translate(-1px, -1px);
+  }
+  75% {
+    transform: translate(2px, 0);
+  }
 }
 
 .hero p {
