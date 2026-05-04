@@ -22,7 +22,6 @@ const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/landing_au
 const SESSION_SECRET = process.env.SESSION_SECRET || "replace-this-session-secret";
 const STORE_TELEGRAM_BOT_TOKEN = process.env.STORE_TELEGRAM_BOT_TOKEN || "";
 const STORE_TELEGRAM_ADMIN_CHAT_ID = process.env.STORE_TELEGRAM_ADMIN_CHAT_ID || "";
-const STORE_BASE_URL = process.env.STORE_BASE_URL || "";
 const MongoStore = connectMongo.default || connectMongo.MongoStore || connectMongo;
 
 const defaultProducts = [
@@ -143,19 +142,6 @@ async function getOrCreateTelegramOffsetConfig() {
   if (!cfg.meta) cfg.meta = { offset: 0 };
   if (!Number.isInteger(cfg.meta.offset)) cfg.meta.offset = 0;
   return cfg;
-}
-
-function getStorePublicBase(req) {
-  if (STORE_BASE_URL) {
-    let base = String(STORE_BASE_URL).trim().replace(/\/+$/, "");
-    if (!/^https?:\/\//i.test(base)) {
-      base = `https://${base}`;
-    }
-    return base;
-  }
-  const proto = req.headers["x-forwarded-proto"] || req.protocol || "http";
-  const host = req.get("host");
-  return `${proto}://${host}`;
 }
 
 async function notifyStoreOrderToTelegram(order) {
@@ -460,9 +446,8 @@ app.get("/api/store/order/:id/status", async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ ok: false, message: "Invalid order." });
   const order = await StoreOrder.findById(id).lean();
   if (!order) return res.status(404).json({ ok: false, message: "Order not found." });
-  const base = getStorePublicBase(req);
   const downloadLink = order.status === "approved" && order.downloadToken
-    ? `${base}/store/download/${order.downloadToken}`
+    ? `/store/download/${order.downloadToken}`
     : null;
   return res.json({
     ok: true,
