@@ -146,7 +146,13 @@ async function getOrCreateTelegramOffsetConfig() {
 }
 
 function getStorePublicBase(req) {
-  if (STORE_BASE_URL) return STORE_BASE_URL.replace(/\/+$/, "");
+  if (STORE_BASE_URL) {
+    let base = String(STORE_BASE_URL).trim().replace(/\/+$/, "");
+    if (!/^https?:\/\//i.test(base)) {
+      base = `https://${base}`;
+    }
+    return base;
+  }
   const proto = req.headers["x-forwarded-proto"] || req.protocol || "http";
   const host = req.get("host");
   return `${proto}://${host}`;
