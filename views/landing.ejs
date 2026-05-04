@@ -14,16 +14,11 @@
     <header class="top-nav">
       <nav class="menu-wrap">
         <div class="dropdown">
-          <button class="dropbtn" type="button">Tools</button>
+          <button class="dropbtn" type="button">Store Product</button>
           <div class="dropdown-content">
             <% tools.forEach((item) => { %>
             <a href="<%= item.url %>" target="_blank" rel="noopener noreferrer"><%= item.name %></a>
             <% }) %>
-          </div>
-        </div>
-        <div class="dropdown">
-          <button class="dropbtn" type="button">Script</button>
-          <div class="dropdown-content">
             <% scripts.forEach((item) => { %>
             <a href="<%= item.url %>" target="_blank" rel="noopener noreferrer"><%= item.name %></a>
             <% }) %>
