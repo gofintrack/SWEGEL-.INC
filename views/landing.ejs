@@ -16,11 +16,27 @@
         <div class="dropdown">
           <button class="dropbtn" type="button">Store Product</button>
           <div class="dropdown-content">
-            <% tools.forEach((item) => { %>
-            <a href="<%= item.url %>" target="_blank" rel="noopener noreferrer"><%= item.name %></a>
+            <% storeProducts.filter((p) => p.category === "tools").forEach((p) => { %>
+            <button
+              class="dropdown-product-btn"
+              type="button"
+              data-id="<%= p._id %>"
+              data-name="<%= p.name %>"
+              data-category="<%= p.category %>"
+              data-desc="<%= p.description || '' %>"
+              data-price="<%= p.priceIdr %>"
+            ><%= p.name %></button>
             <% }) %>
-            <% scripts.forEach((item) => { %>
-            <a href="<%= item.url %>" target="_blank" rel="noopener noreferrer"><%= item.name %></a>
+            <% storeProducts.filter((p) => p.category === "script").forEach((p) => { %>
+            <button
+              class="dropdown-product-btn"
+              type="button"
+              data-id="<%= p._id %>"
+              data-name="<%= p.name %>"
+              data-category="<%= p.category %>"
+              data-desc="<%= p.description || '' %>"
+              data-price="<%= p.priceIdr %>"
+            ><%= p.name %></button>
             <% }) %>
           </div>
         </div>
@@ -46,6 +62,7 @@
           type="button"
           data-id="<%= p._id %>"
           data-name="<%= p.name %>"
+          data-category="<%= p.category %>"
           data-desc="<%= p.description || '' %>"
           data-price="<%= p.priceIdr %>"
           data-cover="<%= p.coverImage || '' %>"
@@ -61,6 +78,7 @@
       <div class="store-modal-card">
         <button id="closeProductModal" class="close-btn" type="button">Close</button>
         <h3 id="pmName">Product</h3>
+        <p id="pmCategory">Category</p>
         <p id="pmDesc">Description</p>
         <p id="pmPrice">Price</p>
         <div class="row">
@@ -78,9 +96,11 @@
     <script src="/js/landing.js"></script>
     <script>
       const cards = Array.from(document.querySelectorAll(".store-card"));
+      const dropdownTriggers = Array.from(document.querySelectorAll(".dropdown-product-btn"));
       const modal = document.getElementById("productModal");
       const closeBtn = document.getElementById("closeProductModal");
       const pmName = document.getElementById("pmName");
+      const pmCategory = document.getElementById("pmCategory");
       const pmDesc = document.getElementById("pmDesc");
       const pmPrice = document.getElementById("pmPrice");
       const buyerEmail = document.getElementById("buyerEmail");
@@ -94,6 +114,7 @@
       function openModal(data) {
         selectedProductId = data.id;
         pmName.textContent = data.name;
+        pmCategory.textContent = `Category: ${String(data.category || "other").toUpperCase()}`;
         pmDesc.textContent = data.desc || "No description.";
         pmPrice.textContent = `Price: Rp${Number(data.price || 0).toLocaleString("id-ID")}`;
         invoiceBox.classList.add("hidden");
@@ -106,8 +127,21 @@
           openModal({
             id: c.dataset.id,
             name: c.dataset.name,
+            category: c.dataset.category,
             desc: c.dataset.desc,
             price: c.dataset.price
+          });
+        });
+      });
+
+      dropdownTriggers.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          openModal({
+            id: btn.dataset.id,
+            name: btn.dataset.name,
+            category: btn.dataset.category,
+            desc: btn.dataset.desc,
+            price: btn.dataset.price
           });
         });
       });
@@ -136,18 +170,21 @@
           const data = await api(`/api/store/order/${encodeURIComponent(orderId)}/status`);
           const order = data.order || {};
           if (order.status === "pending") {
+            const statusEl = document.getElementById("paidStatus");
+            if (statusEl) statusEl.textContent = "Waiting for Telegram admin approval...";
             setTimeout(() => pollOrderStatus(orderId), 3000);
             return;
           }
           if (order.status === "approved") {
-            invoiceBox.innerHTML += `<p class="ok">Approved. <a href="${order.downloadLink}" target="_blank" rel="noopener noreferrer">Download Product</a></p>`;
+            invoiceBox.innerHTML = `<p class="ok">Payment approved. Download unlocked.</p>
+            <p><a href="${order.downloadLink}" target="_blank" rel="noopener noreferrer">Download Product</a></p>`;
             return;
           }
           if (order.status === "rejected") {
-            invoiceBox.innerHTML += `<p class="bad">Rejected by admin.</p>`;
+            invoiceBox.innerHTML = `<p class="bad">Payment rejected by admin.</p>`;
           }
         } catch (e) {
-          invoiceBox.innerHTML += `<p class="bad">${e.message}</p>`;
+          invoiceBox.innerHTML = `<p class="bad">${e.message}</p>`;
         }
       }
 
@@ -176,9 +213,17 @@
             <p><b>No. Rek:</b> ${payment.accountNumber || "005658853460"}</p>
             <p><b>Nama:</b> ${payment.accountName || "Novita"}</p>
             <p><b>USDT TRC20:</b> ${payment.usdtAddress || "TSReaKxV5swr6Fmj6uSzt7wLnnxETMzwED"}</p>
-            <p class="warn">Menunggu Approve/Reject dari admin bot Telegram Store...</p>
+            <button id="paidBtn" type="button" class="paid-btn">Paid</button>
+            <p id="paidStatus" class="warn">Click Paid after payment, then wait for Telegram approval.</p>
           `;
-          pollOrderStatus(lastOrderId);
+          const paidBtn = document.getElementById("paidBtn");
+          if (paidBtn) {
+            paidBtn.addEventListener("click", () => {
+              paidBtn.disabled = true;
+              paidBtn.textContent = "Checking...";
+              pollOrderStatus(lastOrderId);
+            });
+          }
         } catch (e) {
           invoiceBox.classList.remove("hidden");
           invoiceBox.innerHTML = `<p class="bad">${e.message}</p>`;

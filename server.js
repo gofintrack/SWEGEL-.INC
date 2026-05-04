@@ -286,14 +286,9 @@ app.use((req, res, next) => {
 });
 
 app.get("/", async (req, res) => {
-  const products = await Product.find().sort({ category: 1, createdAt: 1 }).lean();
-  const tools = products.filter((p) => p.category === "tools");
-  const scripts = products.filter((p) => p.category === "script");
   const storeProducts = await StoreProduct.find({ isActive: true }).sort({ createdAt: -1 }).lean();
 
   res.render("landing", {
-    tools,
-    scripts,
     storeProducts
   });
 });
