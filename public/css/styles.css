@@ -135,6 +135,96 @@ body {
   padding: 24px;
 }
 
+.store-section {
+  position: relative;
+  z-index: 5;
+  max-width: 1080px;
+  margin: -30px auto 24px;
+  padding: 0 24px 24px;
+}
+
+.store-section h2 {
+  margin-bottom: 12px;
+}
+
+.store-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.store-card {
+  text-align: left;
+  border: 1px solid #2a2a2a;
+  background: rgba(12, 12, 12, 0.9);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.store-card-title {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.store-card-price {
+  color: #ff8a8e;
+}
+
+.store-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+
+.store-modal.hidden {
+  display: none;
+}
+
+.store-modal-card {
+  width: min(720px, 100%);
+  background: #101010;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.close-btn {
+  width: auto;
+  float: right;
+  padding: 8px 12px;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.row > * {
+  flex: 1 1 160px;
+}
+
+.invoice-box {
+  margin-top: 10px;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  padding: 10px;
+  background: #0b0b0b;
+}
+
+.invoice-box.hidden {
+  display: none;
+}
+
+.ok { color: #59d98a; }
+.bad { color: #ff6f74; }
+.warn { color: #ffcf6f; }
+
 .hero h1 {
   margin: 0 0 8px;
   font-size: clamp(2rem, 6vw, 3.4rem);

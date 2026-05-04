@@ -42,6 +42,153 @@
       </a>
     </main>
 
+    <section class="store-section">
+      <h2>Store Products</h2>
+      <div class="store-grid">
+        <% storeProducts.forEach((p) => { %>
+        <button
+          class="store-card"
+          type="button"
+          data-id="<%= p._id %>"
+          data-name="<%= p.name %>"
+          data-desc="<%= p.description || '' %>"
+          data-price="<%= p.priceIdr %>"
+          data-cover="<%= p.coverImage || '' %>"
+        >
+          <div class="store-card-title"><%= p.name %></div>
+          <div class="store-card-price">Rp<%= Number(p.priceIdr || 0).toLocaleString("id-ID") %></div>
+        </button>
+        <% }) %>
+      </div>
+    </section>
+
+    <div id="productModal" class="store-modal hidden">
+      <div class="store-modal-card">
+        <button id="closeProductModal" class="close-btn" type="button">Close</button>
+        <h3 id="pmName">Product</h3>
+        <p id="pmDesc">Description</p>
+        <p id="pmPrice">Price</p>
+        <div class="row">
+          <input id="buyerEmail" type="email" placeholder="buyer email" />
+          <select id="payMethod">
+            <option value="bank">Bank Transfer</option>
+            <option value="usdt">USDT TRC20</option>
+          </select>
+          <button id="buyNowBtn" type="button">Buy Now</button>
+        </div>
+        <div id="invoiceBox" class="invoice-box hidden"></div>
+      </div>
+    </div>
+
     <script src="/js/landing.js"></script>
+    <script>
+      const cards = Array.from(document.querySelectorAll(".store-card"));
+      const modal = document.getElementById("productModal");
+      const closeBtn = document.getElementById("closeProductModal");
+      const pmName = document.getElementById("pmName");
+      const pmDesc = document.getElementById("pmDesc");
+      const pmPrice = document.getElementById("pmPrice");
+      const buyerEmail = document.getElementById("buyerEmail");
+      const payMethod = document.getElementById("payMethod");
+      const buyNowBtn = document.getElementById("buyNowBtn");
+      const invoiceBox = document.getElementById("invoiceBox");
+
+      let selectedProductId = null;
+      let lastOrderId = null;
+
+      function openModal(data) {
+        selectedProductId = data.id;
+        pmName.textContent = data.name;
+        pmDesc.textContent = data.desc || "No description.";
+        pmPrice.textContent = `Price: Rp${Number(data.price || 0).toLocaleString("id-ID")}`;
+        invoiceBox.classList.add("hidden");
+        invoiceBox.innerHTML = "";
+        modal.classList.remove("hidden");
+      }
+
+      cards.forEach((c) => {
+        c.addEventListener("click", () => {
+          openModal({
+            id: c.dataset.id,
+            name: c.dataset.name,
+            desc: c.dataset.desc,
+            price: c.dataset.price
+          });
+        });
+      });
+
+      closeBtn.addEventListener("click", () => modal.classList.add("hidden"));
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) modal.classList.add("hidden");
+      });
+
+      async function api(url, method = "GET", body = null) {
+        const opt = { method, headers: {} };
+        if (body) {
+          opt.headers["Content-Type"] = "application/json";
+          opt.body = JSON.stringify(body);
+        }
+        const res = await fetch(url, opt);
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || json.ok === false) {
+          throw new Error(json.message || "Request failed");
+        }
+        return json;
+      }
+
+      async function pollOrderStatus(orderId) {
+        try {
+          const data = await api(`/api/store/order/${encodeURIComponent(orderId)}/status`);
+          const order = data.order || {};
+          if (order.status === "pending") {
+            setTimeout(() => pollOrderStatus(orderId), 3000);
+            return;
+          }
+          if (order.status === "approved") {
+            invoiceBox.innerHTML += `<p class="ok">Approved. <a href="${order.downloadLink}" target="_blank" rel="noopener noreferrer">Download Product</a></p>`;
+            return;
+          }
+          if (order.status === "rejected") {
+            invoiceBox.innerHTML += `<p class="bad">Rejected by admin.</p>`;
+          }
+        } catch (e) {
+          invoiceBox.innerHTML += `<p class="bad">${e.message}</p>`;
+        }
+      }
+
+      buyNowBtn.addEventListener("click", async () => {
+        try {
+          const email = String(buyerEmail.value || "").trim();
+          if (!email) throw new Error("Isi email buyer dulu.");
+          const payload = {
+            productId: selectedProductId,
+            buyerEmail: email,
+            paymentMethod: payMethod.value
+          };
+          const data = await api("/api/store/order", "POST", payload);
+          const order = data.order || {};
+          const payment = data.payment || {};
+          lastOrderId = order.id;
+          const usdtLine = order.paymentMethod === "usdt" ? `USDT Amount: ${order.usdtAmount || "-"} (TRC20)` : "";
+          invoiceBox.classList.remove("hidden");
+          invoiceBox.innerHTML = `
+            <p><b>Invoice:</b> ${order.invoiceCode}</p>
+            <p><b>Status:</b> ${order.status}</p>
+            <p><b>Amount:</b> Rp${Number(order.amountIdr || 0).toLocaleString("id-ID")}</p>
+            ${usdtLine ? `<p>${usdtLine}</p>` : ""}
+            <hr/>
+            <p><b>Bank:</b> ${payment.bank || "Blu BCA Digital"}</p>
+            <p><b>No. Rek:</b> ${payment.accountNumber || "005658853460"}</p>
+            <p><b>Nama:</b> ${payment.accountName || "Novita"}</p>
+            <p><b>USDT TRC20:</b> ${payment.usdtAddress || "TSReaKxV5swr6Fmj6uSzt7wLnnxETMzwED"}</p>
+            <p class="warn">Menunggu Approve/Reject dari admin bot Telegram Store...</p>
+          `;
+          pollOrderStatus(lastOrderId);
+        } catch (e) {
+          invoiceBox.classList.remove("hidden");
+          invoiceBox.innerHTML = `<p class="bad">${e.message}</p>`;
+        }
+      });
+    </script>
   </body>
 </html>

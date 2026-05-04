@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Store Product Panel</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body class="panel-body">
+    <header class="panel-header">
+      <h1>Store Product Panel</h1>
+      <div class="panel-actions">
+        <a href="/">Landing</a>
+        <a href="/panel">Main Panel</a>
+        <form action="/logout" method="post">
+          <button type="submit" class="logout">Logout</button>
+        </form>
+      </div>
+    </header>
+
+    <main class="panel-main">
+      <% if (error) { %><div class="alert error"><%= error %></div><% } %>
+      <% if (success) { %><div class="alert success"><%= success %></div><% } %>
+
+      <section class="panel-card">
+        <h2>Tambah Store Product</h2>
+        <form action="/store-products" method="post" class="panel-form">
+          <label>Nama Product</label>
+          <input name="name" type="text" required />
+
+          <label>Slug unik (contoh: swegel-sender-pro)</label>
+          <input name="slug" type="text" required />
+
+          <label>Deskripsi</label>
+          <textarea name="description" rows="4" style="width:100%; background:#0b0b0b; color:#fff; border:1px solid #2e2e2e; border-radius:8px; padding:10px 12px;"></textarea>
+
+          <label>Harga IDR</label>
+          <input name="priceIdr" type="number" min="1" value="500000" required />
+
+          <label>Kategori</label>
+          <select name="category">
+            <option value="tools">Tools</option>
+            <option value="script">Script</option>
+            <option value="other">Other</option>
+          </select>
+
+          <label>Cover Image URL (optional)</label>
+          <input name="coverImage" type="url" />
+
+          <label>Download URL (akan dibuka setelah approve)</label>
+          <input name="downloadUrl" type="url" required />
+
+          <label style="display:flex; align-items:center; gap:8px;">
+            <input style="width:auto;" name="isActive" type="checkbox" checked /> Active
+          </label>
+
+          <button type="submit">Simpan Store Product</button>
+        </form>
+      </section>
+
+      <section class="panel-card" style="max-width:100%;">
+        <h2>Daftar Store Product</h2>
+        <div class="product-list">
+          <% if (!products.length) { %>
+          <p>Belum ada store product.</p>
+          <% } %>
+          <% products.forEach((item) => { %>
+          <div class="product-row editable">
+            <form action="/store-products/<%= item._id %>/edit" method="post" class="product-edit-form">
+              <label>Nama Product</label>
+              <input name="name" type="text" value="<%= item.name %>" required />
+
+              <label>Slug</label>
+              <input name="slug" type="text" value="<%= item.slug %>" required />
+
+              <label>Deskripsi</label>
+              <textarea name="description" rows="3" style="width:100%; background:#0b0b0b; color:#fff; border:1px solid #2e2e2e; border-radius:8px; padding:10px 12px;"><%= item.description || '' %></textarea>
+
+              <label>Harga IDR</label>
+              <input name="priceIdr" type="number" min="1" value="<%= item.priceIdr %>" required />
+
+              <label>Kategori</label>
+              <select name="category" required>
+                <option value="tools" <%= item.category === "tools" ? "selected" : "" %>>Tools</option>
+                <option value="script" <%= item.category === "script" ? "selected" : "" %>>Script</option>
+                <option value="other" <%= item.category === "other" ? "selected" : "" %>>Other</option>
+              </select>
+
+              <label>Cover Image URL</label>
+              <input name="coverImage" type="url" value="<%= item.coverImage || '' %>" />
+
+              <label>Download URL</label>
+              <input name="downloadUrl" type="url" value="<%= item.downloadUrl %>" required />
+
+              <label style="display:flex; align-items:center; gap:8px;">
+                <input style="width:auto;" name="isActive" type="checkbox" <%= item.isActive ? "checked" : "" %> /> Active
+              </label>
+
+              <div class="row-actions">
+                <button type="submit">Update</button>
+              </div>
+            </form>
+            <form action="/store-products/<%= item._id %>/delete" method="post" class="delete-form">
+              <button type="submit" class="danger-btn">Hapus</button>
+            </form>
+          </div>
+          <% }) %>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
